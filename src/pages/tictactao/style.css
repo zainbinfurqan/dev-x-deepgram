@@ -1,0 +1,30 @@
+.game-main-container {
+  background-color: white;
+  height: 300px;
+  width: 300px;
+  margin: auto;
+  bottom: 0;
+  top: 0;
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+.row-1 {
+  height: 33.3%;
+}
+.row-2 {
+  height: 33.3%;
+}
+.row-3 {
+  height: 34.3%;
+}
+.tac-box {
+  width: 33.3%;
+  border: 0.1em solid;
+  height: 100%;
+}
+.tac-box-last {
+  width: 34.3%;
+  border: 0.1em solid;
+  height: 100%;
+}

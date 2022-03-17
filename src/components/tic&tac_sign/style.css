@@ -1,0 +1,16 @@
+.tictac-sign-round {
+  height: 100%;
+  width: 100%;
+  border: solid;
+  border-radius: 50%;
+  margin: auto;
+  right: 0;
+}
+
+.tictac-sign-block {
+  height: 100%;
+  width: 100%;
+  border: solid;
+  margin: auto;
+  right: 0;
+}
