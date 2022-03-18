@@ -13,7 +13,6 @@ function Home(props) {
     <div>
       <Rooms />
       <CreateRoom />
-      <JoinRoom />
     </div>
   );
 }
