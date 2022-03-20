@@ -1,19 +1,33 @@
 import { firebaseInstance } from '../configuration/firebase'
+import firebase from "firebase/compat/app";
 const db = firebaseInstance.firestore()
 export const firbaseMethods = {
   //---------
   createUser: async (data) => {
-    const response = await db.collection('users').add({
-      ...data
-    });
-    return response.id
+    try {
+      const response = await db.collection('users').add({
+        ...data
+      });
+      return response.id
+    } catch (error) {
+      return error
+    }
   },
   //---------
-  createRoom: async (data) => {
-    const response = await db.collection('rooms').add({
-      ...data
-    });
-    return response.id
+  createRoom: async (data, gameData) => {
+    try {
+      const response = await db.collection('rooms').add({
+        ...data,
+      });
+      const gameResponse = await firbaseMethods.createGame(response.id, gameData)
+      await db.collection('rooms').doc(response.id).update({
+        gameId: gameResponse
+      });
+      const roomData = await db.collection('rooms').doc(response.id).get();
+      return roomData.data()
+    } catch (error) {
+      console.log(error)
+    }
   },
   //---------
   getRooms: async () => {
@@ -28,21 +42,10 @@ export const firbaseMethods = {
     const responseContent = res.docs.map(doc => doc.data())
     return responseContent
   },
-  // getRealTimeRooms: async () => {
-  //   const responseContent = []
-  //   const response = db.collection('rooms')
-  //   const a = response.onSnapshot(querySnapshot => {
-  //     const responseContent = querySnapshot.docs.map(doc => doc.data())
-  //     console.log(responseContent)
-  //     return responseContent
-  //   }, err => {
-  //     return err
-  //   });
-  //   return a
-  // },
   //---------
   setTicTac: async (id, data) => {
-    const response = await db.collection('game').doc(id).update(data);
+    console.log()
+    const response = await db.collection('games').doc(id).update(data);
     const res = await firbaseMethods.getTicTacData(id)
     return res
   },
@@ -51,5 +54,56 @@ export const firbaseMethods = {
     const response = await db.collection('rooms').doc(id);
     const res = await response.get()
     return res
+  },
+  createGame: async (roomId, game) => {
+    try {
+      const response = await db.collection('games').add({
+        roomId,
+        ...game
+      });
+      return response.id
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  joinGame: async (password, data, userId) => {
+    try {
+      console.log(data)
+      const response = await db.collection('rooms').doc(data.id).get()
+      if (response.data() && Object.keys(response.data()).length > 0) {
+        if (password === response.data().roomPassword) {
+          try {
+            const getGameDataById = await (await db.collection('games').doc(data.gameId).get()).data()
+            getGameDataById[userId] = 'circle'
+            await db.collection('games').doc(data.gameId).update({
+              ...getGameDataById,
+            })
+            const updateGameToAddUserIdInArray = db.collection('games').doc(data.gameId)
+            updateGameToAddUserIdInArray.update({
+              users: firebase.firestore.FieldValue.arrayUnion(userId)
+            })
+          } catch (error) {
+            console.log(error)
+          }
+          return response.data()
+        } else {
+          return false
+        }
+      } else {
+        return false
+      }
+    } catch (error) {
+
+    }
+  },
+  getGame: async (id) => {
+    const response = await db.collection('games').doc(id).get()
+    if (response.data() && Object.keys(response.data()).length > 0) {
+      return response.data()
+    }
+  },
+  resetGame: async (id, data) => {
+    const response = await db.collection('games').doc(id).update(data);
+    return await firbaseMethods.getGame(id)
   }
 };

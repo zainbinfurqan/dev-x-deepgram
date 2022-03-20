@@ -10,8 +10,8 @@ function TicTacSign(props) {
         padding: "30px",
       }}
     >
-      {false && <div className="tictac-sign-round" />}
-      {true && <div className="tictac-sign-block" />}
+      {props.ticSign == 'circle' && <div className="tictac-sign-round" />}
+      {props.ticSign == 'square' && <div className="tictac-sign-block" />}
     </div>
   );
 }
