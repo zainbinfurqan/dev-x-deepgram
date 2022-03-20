@@ -12,11 +12,11 @@ import "./style.css";
 const db = firebaseInstance.firestore()
 
 function TictacTao(props) {
+  let user_ = {}
   const [user, setUser] = useState({})
   const [otherUser, setOtherUser] = useState('')
   const [game, setGame] = useState({})
   const [gameMap, setGameMap] = useState([])
-  const [userTurn, setUserTurn] = useState(null)
   useEffect(async () => {
     const user = await localStorageMethods.getItem('user')
     setUser(user)
@@ -24,21 +24,24 @@ function TictacTao(props) {
   }, [])
 
   const fetchGame = async () => {
-    // console.log('fetchGame')
+    const user_ = await localStorageMethods.getItem('user')
     const gameData = await localStorageMethods.getItem('game')
     const toGetOtherUserId = await db.collection('games').doc(gameData.gameId).get()
-    setOtherUser(toGetOtherUserId.data().users.filter(item => item != user.userId)[0])
+    const otherUserId = await toGetOtherUserId.data().users.filter(item => item != user_.userId)
+    console.log(otherUserId)
+    setOtherUser(otherUserId[0])
     const response = db.collection('games').doc(gameData.gameId)
     response.onSnapshot(querySnapshot => {
+      console.log('querySnapshot.data()', querySnapshot.data())
+      console.log(user_.userId)
+
       const gameMapUser = {}
-      console.log(querySnapshot)
-      setUserTurn(querySnapshot.data().userTurn)
       querySnapshot.data().ticTacData.map(item => {
-        if (item.user == user.userId) {
-          if (gameMapUser.hasOwnProperty(user.userId)) {
-            gameMapUser[user.userId].push(item.ticPosition)
+        if (item.user == user_.userId) {
+          if (gameMapUser.hasOwnProperty(user_.userId)) {
+            gameMapUser[user_.userId].push(item.ticPosition)
           } else {
-            gameMapUser[user.userId] = [item.ticPosition]
+            gameMapUser[user_.userId] = [item.ticPosition]
           }
         } else {
           if (gameMapUser.hasOwnProperty(item.user)) {
@@ -55,35 +58,6 @@ function TictacTao(props) {
     })
   }
 
-  useEffect(async () => {
-    // console.log("get media")
-    // console.log("userTurn", userTurn)
-    // console.log("userTurn", user.userId)
-    // console.log(mediaRecorder)
-    if (userTurn == user.userId) {
-      const { audioNote, mediaRecorder, socket, socketOnOpen, socketOnMessage } = await audioGet.getMediaAudio()
-      if (mediaRecorder != null) {
-        console.log('start')
-        console.log(socket)
-        socket.onopen = () => {
-          mediaRecorder.addEventListener("dataavailable", async (event) => {
-            if (event.data.size > 0 && socket.readyState == 1) {
-              socket.send(event.data);
-              // console.log(event.data)
-            }
-          });
-          mediaRecorder.start();
-        };
-        // mediaRecorder.start(500)
-      }
-      // console.log('aa')
-      //   const result = await audioGet.getMediaAudio()
-      //   console.log(result)
-    } else {
-      //   // mediaRecorder.stop();
-    }
-    // audioGet.getMediaAudio()
-  }, [userTurn])
 
   const handleCheckTic = async (ticBox) => {
     //----------------
@@ -93,10 +67,13 @@ function TictacTao(props) {
     if (game.ticTacData.findIndex(itm => itm.ticPosition == ticBox) < 0) {
       const tic = { user: user.userId, ticPosition: ticBox }
       game.ticTacData.push(tic)
-      game.userTurn = otherUser
+      console.log('before', game)
       const data = {
         ...game
       }
+      data.userTurn = otherUser
+      console.log('otherUser', otherUser)
+      console.log('after', data)
       await firbaseMethods.setTicTac(gameData.gameId, data)
       //-------
       const response = await db.collection('games').doc(gameData.gameId).get()
@@ -128,7 +105,7 @@ function TictacTao(props) {
       // console.log(isGameFinish)
       if (isGameFinish == true) {
         game.isWin = true
-        // game.wins.push(user.userId)
+        game.wins.push(user.userId)
         const gameData_ = await localStorageMethods.getItem('game');
         const updateGameObjectToAddWinner = db.collection('games').doc(gameData_.gameId)
         // updateGameObjectToAddWinner.update({
@@ -143,26 +120,6 @@ function TictacTao(props) {
     } else {
 
     }
-
-    // setGameMap(gameMapUser)
-
-    //----------------
-    // console.log(ticBox)
-    // console.log(game.ticTacData)
-    // console.log(game.ticTacData.findIndex(itm => itm.ticPosition == ticBox))
-    // if (game.ticTacData.findIndex(itm => itm.ticPosition == ticBox) < 0) {
-    // const tic = { user: user.userId, ticPosition: ticBox }
-    // game.ticTacData.push(tic)
-    // game.userTurn = otherUser
-    // console.log(gameMapUser)
-    // console.log(gameMapUser.hasOwnProperty(user.userId))
-    // console.log(gameMap[user.userId].length)
-    // console.log(gameMapUser.hasOwnProperty(user.userId) && gameMapUser)
-    // console.log(gameMapUser.hasOwnProperty(user.userId) && gameMapUser[user.userId])
-
-    // } else {
-    //   console.log('error')
-    // }
   }
 
   const handleStartNewGame = async () => {

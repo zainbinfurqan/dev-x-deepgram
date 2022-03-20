@@ -44,7 +44,7 @@ export const firbaseMethods = {
   },
   //---------
   setTicTac: async (id, data) => {
-    console.log()
+    console.log(data)
     const response = await db.collection('games').doc(id).update(data);
     const res = await firbaseMethods.getTicTacData(id)
     return res
