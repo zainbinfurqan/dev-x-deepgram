@@ -11,7 +11,11 @@ import firebase from "firebase/compat/app";
 import "./style.css";
 const db = firebaseInstance.firestore()
 
+
 function TictacTao(props) {
+
+
+
   let user_ = {}
   const [user, setUser] = useState({})
   const [otherUser, setOtherUser] = useState('')
@@ -28,12 +32,12 @@ function TictacTao(props) {
     const gameData = await localStorageMethods.getItem('game')
     const toGetOtherUserId = await db.collection('games').doc(gameData.gameId).get()
     const otherUserId = await toGetOtherUserId.data().users.filter(item => item != user_.userId)
-    console.log(otherUserId)
+    // console.log(otherUserId)
     setOtherUser(otherUserId[0])
     const response = db.collection('games').doc(gameData.gameId)
     response.onSnapshot(querySnapshot => {
-      console.log('querySnapshot.data()', querySnapshot.data())
-      console.log(user_.userId)
+      // console.log('querySnapshot.data()', querySnapshot.data())
+      // console.log(user_.userId)
 
       const gameMapUser = {}
       querySnapshot.data().ticTacData.map(item => {
@@ -72,8 +76,8 @@ function TictacTao(props) {
         ...game
       }
       data.userTurn = otherUser
-      console.log('otherUser', otherUser)
-      console.log('after', data)
+      // console.log('otherUser', otherUser)
+      // console.log('after', data)
       await firbaseMethods.setTicTac(gameData.gameId, data)
       //-------
       const response = await db.collection('games').doc(gameData.gameId).get()
@@ -131,12 +135,52 @@ function TictacTao(props) {
     setGame(response)
   }
 
+  useEffect(() => {
+    console.log("useEffect for audio")
+    if (game.userTurn == user.userId) {
+      let mediaRecorder = null;
+      window.navigator.mediaDevices.getUserMedia({ audio: true }).then((res) => {
+        mediaRecorder = new MediaRecorder(res, {
+          audio: true,
+        });
+      })
+      let socket = new WebSocket("wss://api.deepgram.com/v1/listen", [
+        "token",
+        "0f23ae2ad1b21bcd93fd898f68bf3fb4d318e32a",
+      ]);
+      socket.onopen = () => {
+        console.log('onopen')
+        mediaRecorder.addEventListener("dataavailable", async (event) => {
+          if (event.data.size > 0 && socket.readyState == 1) {
+            socket.send(event.data);
+            // console.log(event.data)
+          }
+        });
+        mediaRecorder.start(500);
+      };
+      socket.onmessage = (message) => {
+        console.log('onmessage')
+        const received = JSON.parse(message.data);
+        const transcript = received.channel.alternatives[0].transcript;
+        if (transcript && received.is_final) {
+          console.log("transcript=>", transcript);
+          console.log(typeof transcript);
+          mediaRecorder.stop();
+          handleCheckTic(transcript)
+          socket = null
+          // document.querySelector("#captions").textContent += transcript + " ";
+        }
+      };
+    }
+
+  }, [game.userTurn])
+
   return (
     <div>
       {Object.keys(game).length > 0 && game.userTurn != user.userId && <WaitForYourTurn />}
       {Object.keys(game).length > 0 && game.isWin && <GameWinner user={game.wins}
         handleStartNewGame={handleStartNewGame} />}
-      <h2 className='text-white text-center p-5'>Tic Tac Tao</h2>
+      <h2 className='text-white text-center p-5'>Tic Tac Toe</h2>
       <div className="game-main-container">
         <div className="row-1 d-flex">
           <div className="tac-box" id="one:one" onClick={() => handleCheckTic('one one')}>
