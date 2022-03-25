@@ -141,7 +141,6 @@ function TictacTao(props) {
   }
 
   useEffect(async () => {
-    console.log("useEffect for audio")
     if (game.userTurn == user.userId) {
       let mediaRecorder = null;
       await window.navigator.mediaDevices.getUserMedia({ audio: true }).then((res) => {
@@ -151,15 +150,13 @@ function TictacTao(props) {
       })
       let socket = new WebSocket("wss://api.deepgram.com/v1/listen", [
         "token",
-        "0f23ae2ad1b21bcd93fd898f68bf3fb4d318e32a",
+        "06e1b33e25def49e8c87daa5940991afdc34b0b5",
       ]);
-      console.log("mediaRecorder", mediaRecorder)
-      console.log("socket", socket)
       socket.onopen = () => {
         mediaRecorder.addEventListener("dataavailable", async (event) => {
           if (event.data.size > 0 && socket.readyState == 1) {
             socket.send(event.data);
-            // console.log(event.data)
+            console.log(event.data)
           }
         });
         mediaRecorder.start(500);
@@ -172,9 +169,8 @@ function TictacTao(props) {
             transcript,
             'en'
           );
+          handleCheckTic(convertedLanguage)
           mediaRecorder.stop();
-          socket = null
-          // document.querySelector("#captions").textContent += transcript + " ";
         }
       };
     }
@@ -183,8 +179,6 @@ function TictacTao(props) {
 
   return (
     <div>
-      {console.log(game)}
-      {console.log(gameMap)}
       {Object.keys(game).length > 0 && game.userTurn != user.userId && <WaitForYourTurn />}
       {Object.keys(game).length > 0 && game.isWin && <GameWinner user={game.wins}
         handleStartNewGame={handleStartNewGame} />}
