@@ -8,7 +8,7 @@ function WaitForYourTurn(props) {
             showCloseButton={false}
             showConfirm={false}
         >
-            <p>Wait for your turn</p>
+            <p className='font-weight-bold'>Wait for your turn</p>
         </SweetAlert>
     );
 }

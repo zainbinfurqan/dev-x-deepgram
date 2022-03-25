@@ -1,5 +1,7 @@
 .game-main-container {
   background-color: white;
+  border-radius: 5px;
+  box-shadow: 4px 4px 8px -3px #727272;
   height: 300px;
   width: 300px;
   margin: auto;
@@ -16,15 +18,15 @@
   height: 33.3%;
 }
 .row-3 {
-  height: 34.3%;
+  height: 33.3%;
 }
 .tac-box {
   width: 33.3%;
-  border: 0.1em solid;
+  border: 0.1em solid #cdcdcd;
   height: 100%;
 }
 .tac-box-last {
   width: 34.3%;
-  border: 0.1em solid;
+  border: 0.1em solid #cdcdcd;
   height: 100%;
 }

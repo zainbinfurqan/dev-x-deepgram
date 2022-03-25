@@ -8,7 +8,9 @@ import { audioGet } from "../../utils/audioget.utilities";
 import { firbaseMethods } from "../../utils/firebase.utilities";
 import { localStorageMethods } from "../../utils/localstorage.utilities";
 import firebase from "firebase/compat/app";
+import translate from "translate";
 import "./style.css";
+
 const db = firebaseInstance.firestore()
 
 
@@ -58,6 +60,7 @@ function TictacTao(props) {
       setGameMap(gameMapUser)
       setGame({ ...querySnapshot.data() })
     }, err => {
+      console.log(err)
       return err
     })
   }
@@ -68,6 +71,8 @@ function TictacTao(props) {
     let isGameFinish = false
     const gameMapUser = {}
     const gameData = await localStorageMethods.getItem('game')
+    console.log("game", game)
+    console.log("game", game.ticTacData)
     if (game.ticTacData.findIndex(itm => itm.ticPosition == ticBox) < 0) {
       const tic = { user: user.userId, ticPosition: ticBox }
       game.ticTacData.push(tic)
@@ -135,11 +140,11 @@ function TictacTao(props) {
     setGame(response)
   }
 
-  useEffect(() => {
+  useEffect(async () => {
     console.log("useEffect for audio")
     if (game.userTurn == user.userId) {
       let mediaRecorder = null;
-      window.navigator.mediaDevices.getUserMedia({ audio: true }).then((res) => {
+      await window.navigator.mediaDevices.getUserMedia({ audio: true }).then((res) => {
         mediaRecorder = new MediaRecorder(res, {
           audio: true,
         });
@@ -148,8 +153,9 @@ function TictacTao(props) {
         "token",
         "0f23ae2ad1b21bcd93fd898f68bf3fb4d318e32a",
       ]);
+      console.log("mediaRecorder", mediaRecorder)
+      console.log("socket", socket)
       socket.onopen = () => {
-        console.log('onopen')
         mediaRecorder.addEventListener("dataavailable", async (event) => {
           if (event.data.size > 0 && socket.readyState == 1) {
             socket.send(event.data);
@@ -158,15 +164,15 @@ function TictacTao(props) {
         });
         mediaRecorder.start(500);
       };
-      socket.onmessage = (message) => {
-        console.log('onmessage')
+      socket.onmessage = async (message) => {
         const received = JSON.parse(message.data);
         const transcript = received.channel.alternatives[0].transcript;
         if (transcript && received.is_final) {
-          console.log("transcript=>", transcript);
-          console.log(typeof transcript);
+          const convertedLanguage = await translate(
+            transcript,
+            'en'
+          );
           mediaRecorder.stop();
-          handleCheckTic(transcript)
           socket = null
           // document.querySelector("#captions").textContent += transcript + " ";
         }
@@ -177,6 +183,8 @@ function TictacTao(props) {
 
   return (
     <div>
+      {console.log(game)}
+      {console.log(gameMap)}
       {Object.keys(game).length > 0 && game.userTurn != user.userId && <WaitForYourTurn />}
       {Object.keys(game).length > 0 && game.isWin && <GameWinner user={game.wins}
         handleStartNewGame={handleStartNewGame} />}
@@ -189,7 +197,6 @@ function TictacTao(props) {
               Object.keys(game).length > 0 ? game[user.userId]
               : Object.keys(gameMap).length > 0 && gameMap.hasOwnProperty(otherUser) && gameMap[otherUser].includes('one one') && Object.keys(game).length > 0 && game[otherUser]}
             />
-            {/* <p>one:one</p> */}
           </div>
           <div className="tac-box" id="one:two" onClick={() => handleCheckTic('one two')}>
             <TicTacSign ticSign={Object.keys(gameMap).length > 0 &&
@@ -197,7 +204,6 @@ function TictacTao(props) {
               Object.keys(game).length > 0 ? game[user.userId]
               : Object.keys(gameMap).length > 0 && gameMap.hasOwnProperty(otherUser) && gameMap[otherUser].includes('one two') && Object.keys(game).length > 0 && game[otherUser]}
             />
-            {/* <p>one:two</p> */}
           </div>
           <div className="tac-box-last" id="one:three" onClick={() => handleCheckTic('one three')}>
             <TicTacSign ticSign={Object.keys(gameMap).length > 0 &&
@@ -205,7 +211,6 @@ function TictacTao(props) {
               Object.keys(game).length > 0 ? game[user.userId]
               : Object.keys(gameMap).length > 0 && gameMap.hasOwnProperty(otherUser) && gameMap[otherUser].includes('one three') && Object.keys(game).length > 0 && game[otherUser]}
             />
-            {/* <p>one:three</p> */}
           </div>
         </div>
         <div className="row-2 d-flex">
@@ -215,7 +220,6 @@ function TictacTao(props) {
               Object.keys(game).length > 0 ? game[user.userId]
               : Object.keys(gameMap).length > 0 && gameMap.hasOwnProperty(otherUser) && gameMap[otherUser].includes('two:one') && Object.keys(game).length > 0 && game[otherUser]}
             />
-            {/* <p>two:one</p> */}
           </div>
           <div className="tac-box" id="two:two" onClick={() => handleCheckTic('two two')}>
             <TicTacSign ticSign={Object.keys(gameMap).length > 0 &&
@@ -223,7 +227,6 @@ function TictacTao(props) {
               Object.keys(game).length > 0 ? game[user.userId]
               : Object.keys(gameMap).length > 0 && gameMap.hasOwnProperty(otherUser) && gameMap[otherUser].includes('two two') && Object.keys(game).length > 0 && game[otherUser]}
             />
-            {/* <p>two:two</p> */}
           </div>
           <div className="tac-box-last" id="two:three" onClick={() => handleCheckTic('two three')}>
             <TicTacSign ticSign={Object.keys(gameMap).length > 0 &&
@@ -231,7 +234,6 @@ function TictacTao(props) {
               Object.keys(game).length > 0 ? game[user.userId]
               : Object.keys(gameMap).length > 0 && gameMap.hasOwnProperty(otherUser) && gameMap[otherUser].includes('two three') && Object.keys(game).length > 0 && game[otherUser]}
             />
-            {/* <p>two:three</p> */}
           </div>
         </div>
         <div className="row-3 d-flex">
@@ -241,7 +243,6 @@ function TictacTao(props) {
               Object.keys(game).length > 0 ? game[user.userId]
               : Object.keys(gameMap).length > 0 && gameMap.hasOwnProperty(otherUser) && gameMap[otherUser].includes('three one') && Object.keys(game).length > 0 && game[otherUser]}
             />
-            {/* <p>three:one</p> */}
           </div>
           <div className="tac-box" id="three:two" onClick={() => handleCheckTic('three two')}>
             <TicTacSign ticSign={Object.keys(gameMap).length > 0 &&
@@ -249,7 +250,6 @@ function TictacTao(props) {
               Object.keys(game).length > 0 ? game[user.userId]
               : Object.keys(gameMap).length > 0 && gameMap.hasOwnProperty(otherUser) && gameMap[otherUser].includes('three two') && Object.keys(game).length > 0 && game[otherUser]}
             />
-            {/* <p>three:two</p> */}
           </div>
           <div className="tac-box-last" id="three:three" onClick={() => handleCheckTic('three three')}>
             <TicTacSign ticSign={Object.keys(gameMap).length > 0 &&
@@ -257,7 +257,6 @@ function TictacTao(props) {
               Object.keys(game).length > 0 ? game[user.userId]
               : Object.keys(gameMap).length > 0 && gameMap.hasOwnProperty(otherUser) && gameMap[otherUser].includes('three three') && Object.keys(game).length > 0 && game[otherUser]}
             />
-            {/* <p>three:three</p> */}
           </div>
         </div>
       </div>
