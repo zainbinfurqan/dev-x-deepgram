@@ -37,7 +37,7 @@ function CreateRoom(props) {
   return (
     <div>
       <div className="create-room-">
-        <GameInstructions isOpen={GameInstructionsIsOpen} />
+        <GameInstructions isOpen={GameInstructionsIsOpen} handleClose={() => setGameInstructionsIsOpen(!GameInstructionsIsOpen)} />
         <div className="form-panel">
           <p className="text-black text-right font-weight-bold cursor-pointer" onClick={() => setGameInstructionsIsOpen(!GameInstructionsIsOpen)}>Game instructions!</p>
           <input type="text" value={room} placeholder="Room name" onChange={(e) => setRoom(e.target.value)} />

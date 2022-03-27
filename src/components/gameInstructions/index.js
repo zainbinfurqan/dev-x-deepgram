@@ -7,12 +7,14 @@ function GameInstructions(props) {
             show={props.isOpen}
             showCancel={true}
             showConfirm={false}
+            onCancel={props.handleClose}
         >
             <div>
-                <ul>
-                    <li></li>
-                    <li></li>
-                    <li></li>
+                <ul className='text-left'>
+                    <li className=''>Any two users can play this game</li>
+                    <li>Your Mic access requried to play this game</li>
+                    <li>You can select language from the given list</li>
+                    <li>Terms/Comands for user sign e.g. "one one"</li>
                 </ul>
             </div>
         </SweetAlert>
