@@ -21,7 +21,7 @@ function Rooms(props) {
     const response = db.collection('rooms')
     response.onSnapshot(querySnapshot => {
       const responseContent = querySnapshot.docs.map(doc => {
-        let data = { room: doc.data().room, roomPassword: doc.data().roomPassword, id: doc.id, gameId: doc.data().gameId }
+        let data = { room: doc.data().room, roomPassword: doc.data().roomPassword, id: doc.id, gameId: doc.data().gameId, users: doc.data().users }
         return { ...data }
       })
       setRooms([...responseContent])
@@ -61,12 +61,14 @@ function Rooms(props) {
         handleClose={handleClose} />}
       {rooms.length > 0 && rooms.map((item, index) => {
         return (
-          <div onClick={() => handleEnterRoom(item)} key={index} className="single-room-container">
+          <div onClick={item?.users && item.users.length < 2 ? () => handleEnterRoom(item) : () => { }} key={index} className="d-flex single-room-container">
             <p className="text-black px-2">{item.room}</p>
+            {console.log(item.users)}
+            {item?.users && item.users.length == 2 && <p className="text-black px-2 font-weight-bold text-danger">Room full</p>}
           </div>
         );
       })}
-    </div>
+    </div >
   );
 }
 

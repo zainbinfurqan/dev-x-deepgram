@@ -68,7 +68,12 @@ export const firbaseMethods = {
   },
   joinGame: async (password, data, userId) => {
     try {
-      console.log(data)
+      var singleRoom = db.collection('rooms').doc(data.id);
+      await singleRoom.update({
+        // users: admin.firestore.FieldValue.arrayUnion('greater_virginia')
+        users: firebase.firestore.FieldValue.arrayUnion(userId)
+      });
+      await db.collection('rooms').doc(data.id).get()
       const response = await db.collection('rooms').doc(data.id).get()
       if (response.data() && Object.keys(response.data()).length > 0) {
         if (password === response.data().roomPassword) {
