@@ -26,7 +26,7 @@ function Login(props) {
       if (respons) {
         localStorageMethods.setItem('user', { ...user, userId: respons })
         setUserName('');
-        history('/home')
+        history('/games-list')
       }
     } catch (error) {
       console.log(error)

@@ -3,7 +3,7 @@ import Rooms from "../../components/rooms";
 import CreateRoom from "../../components/rooms/create";
 import JoinRoom from "../../components/rooms/join";
 import { firbaseMethods } from '../../utils/firebase.utilities'
-function Home(props) {
+function TicTacToeHome(props) {
 
   useEffect(async () => {
 
@@ -17,4 +17,4 @@ function Home(props) {
   );
 }
 
-export default Home;
+export default TicTacToeHome;

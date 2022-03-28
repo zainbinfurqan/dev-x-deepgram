@@ -3,7 +3,7 @@ import "./App.css";
 import { useEffect } from "react";
 import TictacTao from "./pages/tictactao";
 import Login from "./pages/login";
-import Home from "./pages/home";
+import TicTacToeHome from "./pages/tictactoe-game-home";
 import {
   BrowserRouter as Router,
   Routes,
@@ -11,6 +11,7 @@ import {
   Link
 } from "react-router-dom";
 import GamesList from "./pages/gameslist";
+import VoiceAlphabates from "./pages/voice-alphabates";
 // import { Deepgram } from "@deepgram/sdk";
 
 function App() {
@@ -19,9 +20,10 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
-        <Route path="game-tictactoe-home" element={<Home />} />
         <Route path="games-list" element={<GamesList />} />
+        <Route path="game-tictactoe-home" element={<TicTacToeHome />} />
         <Route path="game-tictactoe" element={<TictacTao />} />
+        <Route path="game-voice-alphabates-home" element={<VoiceAlphabates />} />
       </Routes>
     </Router>
   );
