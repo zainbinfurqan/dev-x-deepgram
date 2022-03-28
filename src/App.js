@@ -10,6 +10,7 @@ import {
   Route,
   Link
 } from "react-router-dom";
+import GamesList from "./pages/gameslist";
 // import { Deepgram } from "@deepgram/sdk";
 
 function App() {
@@ -18,8 +19,9 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
-        <Route path="home" element={<Home />} />
-        <Route path="game" element={<TictacTao />} />
+        <Route path="game-tictactoe-home" element={<Home />} />
+        <Route path="games-list" element={<GamesList />} />
+        <Route path="game-tictactoe" element={<TictacTao />} />
       </Routes>
     </Router>
   );
