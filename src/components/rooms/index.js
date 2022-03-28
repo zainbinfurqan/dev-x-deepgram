@@ -40,14 +40,16 @@ function Rooms(props) {
   }
 
   const handleConfirm = async (password) => {
+    setOpenEnterRoomPanel(!openEnterRoompanel)
     delete selectedRoom.roomPassword
     //getting user data from local storage
     const { userId } = await localStorageMethods.getItem('user');
     //join room
     const response = await firbaseMethods.joinGame(password, selectedRoom, userId)
-    await localStorageMethods.setItem('room', { ...response })
-    await localStorageMethods.setItem('game', { gameId: response.gameId })
     if (response) {
+      console.log(response)
+      await localStorageMethods.setItem('room', { ...response })
+      await localStorageMethods.setItem('game', { gameId: response.gameId })
       history('/game')
     }
   }
@@ -63,7 +65,6 @@ function Rooms(props) {
         return (
           <div onClick={item?.users && item.users.length < 2 ? () => handleEnterRoom(item) : () => { }} key={index} className="d-flex single-room-container">
             <p className="text-black px-2">{item.room}</p>
-            {console.log(item.users)}
             {item?.users && item.users.length == 2 && <p className="text-black px-2 font-weight-bold text-danger">Room full</p>}
           </div>
         );

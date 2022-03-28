@@ -45,7 +45,7 @@ export const firbaseMethods = {
   //---------
   setTicTac: async (id, data) => {
     console.log(data)
-    const response = await db.collection('games').doc(id).update(data);
+    await db.collection('games').doc(id).update(data);
     const res = await firbaseMethods.getTicTacData(id)
     return res
   },
@@ -66,6 +66,7 @@ export const firbaseMethods = {
       console.log(error)
     }
   },
+
   joinGame: async (password, data, userId) => {
     try {
       var singleRoom = db.collection('rooms').doc(data.id);
@@ -98,9 +99,10 @@ export const firbaseMethods = {
         return false
       }
     } catch (error) {
-
+      console.log(error)
     }
   },
+
   getGame: async (id) => {
     const response = await db.collection('games').doc(id).get()
     if (response.data() && Object.keys(response.data()).length > 0) {
@@ -108,7 +110,7 @@ export const firbaseMethods = {
     }
   },
   resetGame: async (id, data) => {
-    const response = await db.collection('games').doc(id).update(data);
+    await db.collection('games').doc(id).update(data);
     return await firbaseMethods.getGame(id)
   }
 };

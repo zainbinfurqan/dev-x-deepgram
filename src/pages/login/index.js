@@ -8,10 +8,7 @@ import "./style.css";
 function Login(props) {
   const history = useNavigate()
   const [userName, setUserName] = useState('')
-  const [selectedValue, setSelectedValue] = useState({
-    value: "English",
-    label: "en",
-  });
+  const [selectedValue, setSelectedValue] = useState({ value: "en", label: "English" });
   const options = [
     { value: "en", label: "English" },
     { value: "de", label: "Deutsch" },
@@ -46,6 +43,7 @@ function Login(props) {
         <div className="form">
           <input type="text" onChange={(e) => setUserName(e.target.value)} placeholder="Name" />
           <div className="py-2">
+            <p className="text-left font-weight-bold">Select Language</p>
             <Select options={options} value={selectedValue} onChange={handleChangeLanguage} />
           </div>
           <button onClick={handleLogin}>create/login</button>

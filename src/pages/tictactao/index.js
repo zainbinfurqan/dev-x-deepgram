@@ -13,12 +13,8 @@ import "./style.css";
 
 const db = firebaseInstance.firestore()
 
-
 function TictacTao(props) {
 
-
-
-  let user_ = {}
   const [user, setUser] = useState({})
   const [otherUser, setOtherUser] = useState('')
   const [game, setGame] = useState({})
@@ -33,15 +29,8 @@ function TictacTao(props) {
   const fetchGame = async () => {
     const user_ = await localStorageMethods.getItem('user')
     const gameData = await localStorageMethods.getItem('game')
-    const toGetOtherUserId = await db.collection('games').doc(gameData.gameId).get()
-    const otherUserId = await toGetOtherUserId.data().users.filter(item => item != user_.userId)
-    // console.log(otherUserId)
-    setOtherUser(otherUserId[0])
     const response = db.collection('games').doc(gameData.gameId)
-    response.onSnapshot(querySnapshot => {
-      // console.log('querySnapshot.data()', querySnapshot.data())
-      // console.log(user_.userId)
-
+    response.onSnapshot(async querySnapshot => {
       const gameMapUser = {}
       querySnapshot.data().ticTacData.map(item => {
         if (item.user == user_.userId) {
@@ -66,69 +55,76 @@ function TictacTao(props) {
     })
   }
 
+  const handleCheckIfSelectedTicAlreadyExsist = async (userSelectedTic) => {
+    const getGameResponseFromLocalHost = await localStorageMethods.getItem('game')
+    const getGameResponseFromFirebase = await db.collection('games').doc(getGameResponseFromLocalHost.gameId).get()
+    let game = await getGameResponseFromFirebase.data();
+    if (game.length > 0 && game.ticTacData.length > 0) {
+      if (game.ticTacData.findIndex(itm => itm.ticPosition == userSelectedTic) < 0) {
+        await handleCheckTic(game, userSelectedTic)
+      } else {
 
-  const handleCheckTic = async (ticBox) => {
-    //----------------
-    let isGameFinish = false
-    const gameMapUser = {}
-    const gameData = await localStorageMethods.getItem('game')
-    console.log("game", game)
-    console.log("game", game.ticTacData)
-    if (game.ticTacData.findIndex(itm => itm.ticPosition == ticBox) < 0) {
-      const tic = { user: user.userId, ticPosition: ticBox }
-      game.ticTacData.push(tic)
-      console.log('before', game)
-      const data = {
-        ...game
       }
-      data.userTurn = otherUser
-      // console.log('otherUser', otherUser)
-      // console.log('after', data)
-      await firbaseMethods.setTicTac(gameData.gameId, data)
+    } else {
+      await handleCheckTic(game, userSelectedTic)
+    }
+  }
+
+  const handleCheckTic = async (game, userSelectedTic) => {
+    try {
+      //----------------
+      const userFromLocalStorage = await localStorageMethods.getItem('user')
+      const createGameUserMapping = {}
+      const tic = { user: user.userId, ticPosition: userSelectedTic }
+      const getGameResponseFromLocalHost = await localStorageMethods.getItem('game')
+      // const getGameResponseFromFirebase = db.collection('games').doc(getGameResponseFromLocalHost.gameId).get()
+
+      // let game = await getGameResponseFromFirebase.data();
+      let isGameFinish = false
+      const otherUserId = game.users.filter(item => item != userFromLocalStorage.userId)
+      game.ticTacData.push(tic)
+      game.userTurn = otherUserId[0]
+
+      await firbaseMethods.setTicTac(getGameResponseFromLocalHost.gameId, game)
       //-------
-      const response = await db.collection('games').doc(gameData.gameId).get()
+      const response = await db.collection('games').doc(getGameResponseFromLocalHost.gameId).get()
+
       await response.data().ticTacData.map(item => {
+
         if (item.user == user.userId) {
-          if (gameMapUser.hasOwnProperty(user.userId)) {
-            gameMapUser[user.userId].push(item.ticPosition)
+          if (createGameUserMapping.hasOwnProperty(user.userId)) {
+            createGameUserMapping[user.userId].push(item.ticPosition)
           } else {
-            gameMapUser[user.userId] = [item.ticPosition]
+            createGameUserMapping[user.userId] = [item.ticPosition]
           }
         } else {
-          if (gameMapUser.hasOwnProperty(item.user)) {
-            gameMapUser[item.user].push(item.ticPosition)
+          if (createGameUserMapping.hasOwnProperty(item.user)) {
+            createGameUserMapping[item.user].push(item.ticPosition)
           } else {
-            gameMapUser[item.user] = [item.ticPosition]
+            createGameUserMapping[item.user] = [item.ticPosition]
           }
         }
       });
       //-----
-      if (gameMapUser.hasOwnProperty(user.userId) && gameMapUser[user.userId].length > 2) {
+      if (createGameUserMapping.hasOwnProperty(user.userId) && createGameUserMapping[user.userId].length > 2) {
         for (let i = 0; i < constants.tictactaoPairs.length; i++) {
-          isGameFinish = gameMapUser.hasOwnProperty(user.userId) && constants.tictactaoPairs[i].every(element => {
-            return gameMapUser[user.userId].includes(element);
+          isGameFinish = createGameUserMapping.hasOwnProperty(user.userId) && constants.tictactaoPairs[i].every(element => {
+            return createGameUserMapping[user.userId].includes(element);
           });
-          console.log("isGameFinish for=>", isGameFinish)
           if (isGameFinish) { break }
         }
       }
-      // console.log(isGameFinish)
+
       if (isGameFinish == true) {
         game.isWin = true
         game.wins.push(user.userId)
-        const gameData_ = await localStorageMethods.getItem('game');
-        const updateGameObjectToAddWinner = db.collection('games').doc(gameData_.gameId)
-        // updateGameObjectToAddWinner.update({
-        //   users: firebase.firestore.FieldValue.arrayUnion(user.userId)
-        // })
-        const data = {
-          ...game
-        }
-        await firbaseMethods.setTicTac(gameData.gameId, data)
-        console.log('user' + ' ' + user.userId + ' ' + 'win')
+        game.userTurn = otherUser
+        await firbaseMethods.setTicTac(getGameResponseFromLocalHost.gameId, game)
       }
-    } else {
+    }
 
+    catch (error) {
+      console.log(error)
     }
   }
 
@@ -157,7 +153,6 @@ function TictacTao(props) {
         mediaRecorder.addEventListener("dataavailable", async (event) => {
           if (event.data.size > 0 && socket.readyState == 1) {
             socket.send(event.data);
-            console.log(event.data)
           }
         });
         mediaRecorder.start(500);
@@ -170,7 +165,7 @@ function TictacTao(props) {
             transcript,
             'en'
           );
-          handleCheckTic(convertedLanguage)
+          handleCheckIfSelectedTicAlreadyExsist(convertedLanguage)
           mediaRecorder.stop();
         }
       };
@@ -186,21 +181,21 @@ function TictacTao(props) {
       <h2 className='text-white text-center p-5'>Tic Tac Toe</h2>
       <div className="game-main-container">
         <div className="row-1 d-flex">
-          <div className="tac-box" id="one:one" onClick={() => handleCheckTic('one one')}>
+          <div className="tac-box" id="one one" onClick={() => handleCheckIfSelectedTicAlreadyExsist('one one')}>
             <TicTacSign ticSign={Object.keys(gameMap).length > 0 &&
               gameMap.hasOwnProperty(user.userId) && gameMap[user.userId].includes('one one') &&
               Object.keys(game).length > 0 ? game[user.userId]
               : Object.keys(gameMap).length > 0 && gameMap.hasOwnProperty(otherUser) && gameMap[otherUser].includes('one one') && Object.keys(game).length > 0 && game[otherUser]}
             />
           </div>
-          <div className="tac-box" id="one:two" onClick={() => handleCheckTic('one two')}>
+          <div className="tac-box" id="one two" onClick={() => handleCheckIfSelectedTicAlreadyExsist('one two')}>
             <TicTacSign ticSign={Object.keys(gameMap).length > 0 &&
               gameMap.hasOwnProperty(user.userId) && gameMap[user.userId].includes('one two') &&
               Object.keys(game).length > 0 ? game[user.userId]
               : Object.keys(gameMap).length > 0 && gameMap.hasOwnProperty(otherUser) && gameMap[otherUser].includes('one two') && Object.keys(game).length > 0 && game[otherUser]}
             />
           </div>
-          <div className="tac-box-last" id="one:three" onClick={() => handleCheckTic('one three')}>
+          <div className="tac-box-last" id="one three" onClick={() => handleCheckIfSelectedTicAlreadyExsist('one three')}>
             <TicTacSign ticSign={Object.keys(gameMap).length > 0 &&
               gameMap.hasOwnProperty(user.userId) && gameMap[user.userId].includes('one three') &&
               Object.keys(game).length > 0 ? game[user.userId]
@@ -209,21 +204,21 @@ function TictacTao(props) {
           </div>
         </div>
         <div className="row-2 d-flex">
-          <div className="tac-box" id="two:one" onClick={() => handleCheckTic('two:one')}>
+          <div className="tac-box" id="two one" onClick={() => handleCheckIfSelectedTicAlreadyExsist('two one')}>
             <TicTacSign ticSign={Object.keys(gameMap).length > 0 &&
-              gameMap.hasOwnProperty(user.userId) && gameMap[user.userId].includes('two:one') &&
+              gameMap.hasOwnProperty(user.userId) && gameMap[user.userId].includes('two one') &&
               Object.keys(game).length > 0 ? game[user.userId]
-              : Object.keys(gameMap).length > 0 && gameMap.hasOwnProperty(otherUser) && gameMap[otherUser].includes('two:one') && Object.keys(game).length > 0 && game[otherUser]}
+              : Object.keys(gameMap).length > 0 && gameMap.hasOwnProperty(otherUser) && gameMap[otherUser].includes('two one') && Object.keys(game).length > 0 && game[otherUser]}
             />
           </div>
-          <div className="tac-box" id="two:two" onClick={() => handleCheckTic('two two')}>
+          <div className="tac-box" id="two two" onClick={() => handleCheckIfSelectedTicAlreadyExsist('two two')}>
             <TicTacSign ticSign={Object.keys(gameMap).length > 0 &&
               gameMap.hasOwnProperty(user.userId) && gameMap[user.userId].includes('two two') &&
               Object.keys(game).length > 0 ? game[user.userId]
               : Object.keys(gameMap).length > 0 && gameMap.hasOwnProperty(otherUser) && gameMap[otherUser].includes('two two') && Object.keys(game).length > 0 && game[otherUser]}
             />
           </div>
-          <div className="tac-box-last" id="two:three" onClick={() => handleCheckTic('two three')}>
+          <div className="tac-box-last" id="two three" onClick={() => handleCheckIfSelectedTicAlreadyExsist('two three')}>
             <TicTacSign ticSign={Object.keys(gameMap).length > 0 &&
               gameMap.hasOwnProperty(user.userId) && gameMap[user.userId].includes('two three') &&
               Object.keys(game).length > 0 ? game[user.userId]
@@ -232,21 +227,21 @@ function TictacTao(props) {
           </div>
         </div>
         <div className="row-3 d-flex">
-          <div className="tac-box" id="three:one" onClick={() => handleCheckTic('three one')}>
+          <div className="tac-box" id="three one" onClick={() => handleCheckIfSelectedTicAlreadyExsist('three one')}>
             <TicTacSign ticSign={Object.keys(gameMap).length > 0 &&
               gameMap.hasOwnProperty(user.userId) && gameMap[user.userId].includes('three one') &&
               Object.keys(game).length > 0 ? game[user.userId]
               : Object.keys(gameMap).length > 0 && gameMap.hasOwnProperty(otherUser) && gameMap[otherUser].includes('three one') && Object.keys(game).length > 0 && game[otherUser]}
             />
           </div>
-          <div className="tac-box" id="three:two" onClick={() => handleCheckTic('three two')}>
+          <div className="tac-box" id="three two" onClick={() => handleCheckIfSelectedTicAlreadyExsist('three two')}>
             <TicTacSign ticSign={Object.keys(gameMap).length > 0 &&
               gameMap.hasOwnProperty(user.userId) && gameMap[user.userId].includes('three two') &&
               Object.keys(game).length > 0 ? game[user.userId]
               : Object.keys(gameMap).length > 0 && gameMap.hasOwnProperty(otherUser) && gameMap[otherUser].includes('three two') && Object.keys(game).length > 0 && game[otherUser]}
             />
           </div>
-          <div className="tac-box-last" id="three:three" onClick={() => handleCheckTic('three three')}>
+          <div className="tac-box-last" id="three three" onClick={() => handleCheckIfSelectedTicAlreadyExsist('three three')}>
             <TicTacSign ticSign={Object.keys(gameMap).length > 0 &&
               gameMap.hasOwnProperty(user.userId) && gameMap[user.userId].includes('three three') &&
               Object.keys(game).length > 0 ? game[user.userId]
