@@ -27,7 +27,7 @@ function CreateRoom(props) {
       const response = await firbaseMethods.createRoom(data, gameData);
       await localStorageMethods.setItem('room', { ...response })
       await localStorageMethods.setItem('game', { gameId: response.gameId })
-      history('/game')
+      history('/game-tictactoe')
     } catch (error) {
       console.log(error)
     }
