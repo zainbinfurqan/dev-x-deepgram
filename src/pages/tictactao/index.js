@@ -175,6 +175,7 @@ function TictacTao(props) {
 
   return (
     <div>
+    {console.log("gameMap",gameMap)}
       {Object.keys(game).length > 0 && game.userTurn != user.userId && <WaitForYourTurn />}
       {Object.keys(game).length > 0 && game.isWin && <GameWinner user={game.wins}
         handleStartNewGame={handleStartNewGame} />}
