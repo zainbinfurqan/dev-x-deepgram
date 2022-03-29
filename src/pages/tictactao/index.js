@@ -29,13 +29,13 @@ function TictacTao(props) {
   const fetchGame = async () => {
     const user_ = await localStorageMethods.getItem('user')
     const gameData = await localStorageMethods.getItem('game')
-    const response = db.collection('games').doc(gameData.gameId)
+    const response = db.collection('tictactoe-game').doc(gameData.gameId)
     response.onSnapshot(async querySnapshot => {
       const gameMapUser = {}
       querySnapshot.data().ticTacData.map(item => {
-        if(querySnapshot.data().users && querySnapshot.data().users.length>0){
-        const otherUserId = querySnapshot.data().users.filter(item => item != user_.userId)
-        if(otherUserId.length>0){setOtherUser(otherUserId[0])}
+        if (querySnapshot.data().users && querySnapshot.data().users.length > 0) {
+          const otherUserId = querySnapshot.data().users.filter(item => item != user_.userId)
+          if (otherUserId.length > 0) { setOtherUser(otherUserId[0]) }
         }
         if (item.user == user_.userId) {
           if (gameMapUser.hasOwnProperty(user_.userId)) {
@@ -61,7 +61,7 @@ function TictacTao(props) {
 
   const handleCheckIfSelectedTicAlreadyExsist = async (userSelectedTic) => {
     const getGameResponseFromLocalHost = await localStorageMethods.getItem('game')
-    const getGameResponseFromFirebase = await db.collection('games').doc(getGameResponseFromLocalHost.gameId).get()
+    const getGameResponseFromFirebase = await db.collection('tictactoe-game').doc(getGameResponseFromLocalHost.gameId).get()
     let game = await getGameResponseFromFirebase.data();
     if (game.length > 0 && game.ticTacData.length > 0) {
       if (game.ticTacData.findIndex(itm => itm.ticPosition == userSelectedTic) < 0) {
@@ -81,7 +81,7 @@ function TictacTao(props) {
       const createGameUserMapping = {}
       const tic = { user: user.userId, ticPosition: userSelectedTic }
       const getGameResponseFromLocalHost = await localStorageMethods.getItem('game')
-      // const getGameResponseFromFirebase = db.collection('games').doc(getGameResponseFromLocalHost.gameId).get()
+      // const getGameResponseFromFirebase = db.collection('tictactoe-game').doc(getGameResponseFromLocalHost.gameId).get()
 
       // let game = await getGameResponseFromFirebase.data();
       let isGameFinish = false
@@ -91,7 +91,7 @@ function TictacTao(props) {
 
       await firbaseMethods.setTicTac(getGameResponseFromLocalHost.gameId, game)
       //-------
-      const response = await db.collection('games').doc(getGameResponseFromLocalHost.gameId).get()
+      const response = await db.collection('tictactoe-game').doc(getGameResponseFromLocalHost.gameId).get()
 
       await response.data().ticTacData.map(item => {
 
@@ -179,7 +179,7 @@ function TictacTao(props) {
 
   return (
     <div>
-    {console.log("gameMap",gameMap)}
+      {console.log("gameMap", gameMap)}
       {Object.keys(game).length > 0 && game.userTurn != user.userId && <WaitForYourTurn />}
       {Object.keys(game).length > 0 && game.isWin && <GameWinner user={game.wins}
         handleStartNewGame={handleStartNewGame} />}

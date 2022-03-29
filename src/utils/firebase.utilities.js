@@ -45,7 +45,7 @@ export const firbaseMethods = {
   //---------
   setTicTac: async (id, data) => {
     console.log(data)
-    await db.collection('games').doc(id).update(data);
+    await db.collection('tictactoe-game').doc(id).update(data);
     const res = await firbaseMethods.getTicTacData(id)
     return res
   },
@@ -57,7 +57,7 @@ export const firbaseMethods = {
   },
   createGame: async (roomId, game) => {
     try {
-      const response = await db.collection('games').add({
+      const response = await db.collection('tictactoe-game').add({
         roomId,
         ...game
       });
@@ -79,12 +79,12 @@ export const firbaseMethods = {
       if (response.data() && Object.keys(response.data()).length > 0) {
         if (password === response.data().roomPassword) {
           try {
-            const getGameDataById = await (await db.collection('games').doc(data.gameId).get()).data()
+            const getGameDataById = await (await db.collection('tictactoe-game').doc(data.gameId).get()).data()
             getGameDataById[userId] = 'circle'
-            await db.collection('games').doc(data.gameId).update({
+            await db.collection('tictactoe-game').doc(data.gameId).update({
               ...getGameDataById,
             })
-            const updateGameToAddUserIdInArray = db.collection('games').doc(data.gameId)
+            const updateGameToAddUserIdInArray = db.collection('tictactoe-game').doc(data.gameId)
             updateGameToAddUserIdInArray.update({
               users: firebase.firestore.FieldValue.arrayUnion(userId)
             })
@@ -104,13 +104,13 @@ export const firbaseMethods = {
   },
 
   getGame: async (id) => {
-    const response = await db.collection('games').doc(id).get()
+    const response = await db.collection('tictactoe-game').doc(id).get()
     if (response.data() && Object.keys(response.data()).length > 0) {
       return response.data()
     }
   },
   resetGame: async (id, data) => {
-    await db.collection('games').doc(id).update(data);
+    await db.collection('tictactoe-game').doc(id).update(data);
     return await firbaseMethods.getGame(id)
   }
 };
