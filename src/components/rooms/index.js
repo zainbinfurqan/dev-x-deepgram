@@ -50,7 +50,7 @@ function Rooms(props) {
       console.log(response)
       await localStorageMethods.setItem('room', { ...response })
       await localStorageMethods.setItem('game', { gameId: response.gameId })
-      history('/game')
+      history('/game-tictactoe')
     }
   }
 
