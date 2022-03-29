@@ -18,7 +18,7 @@ function TictacTao(props) {
   const [user, setUser] = useState({})
   const [otherUser, setOtherUser] = useState('')
   const [game, setGame] = useState({})
-  const [gameMap, setGameMap] = useState([])
+  const [gameMap, setGameMap] = useState({})
 
   useEffect(async () => {
     const user = await localStorageMethods.getItem('user')
