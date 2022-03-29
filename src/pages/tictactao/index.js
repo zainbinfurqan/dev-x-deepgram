@@ -33,6 +33,10 @@ function TictacTao(props) {
     response.onSnapshot(async querySnapshot => {
       const gameMapUser = {}
       querySnapshot.data().ticTacData.map(item => {
+        if(querySnapshot.data().users && querySnapshot.data().users.length>0){
+        const otherUserId = querySnapshot.data().users.filter(item => item != user_.userId)
+        if(otherUserId.length>0){setOtherUser(otherUserId[0])}
+        }
         if (item.user == user_.userId) {
           if (gameMapUser.hasOwnProperty(user_.userId)) {
             gameMapUser[user_.userId].push(item.ticPosition)
