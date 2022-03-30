@@ -19,7 +19,7 @@ function CreateRoom(props) {
           adminUser: await userId,
           users: userId,
           wrongAnswers: 0,
-          writeAnswers: 0,
+          riteAnswers: 0,
           alphabates: ['P', 'B', 'X', 'V', 'S', 'I', 'G', 'N', 'F', 'J', 'K', 'Y',
             'M', 'H', 'O', 'A', 'Q', 'R', 'E', 'T', 'U', 'D', 'W', 'C',
             'L', 'Z'],

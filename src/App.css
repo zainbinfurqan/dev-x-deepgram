@@ -24,6 +24,18 @@
   background-image: url("./assets/images/mainbg.png");
   background-size: contain;
 }
+.voice-alphabate-game-home-container {
+  height: 100vh;
+  font-family: "Indie Flower", cursive;
+  background-image: url("./assets/images/voice-words.jpg");
+  background-size: contain;
+}
+.voice-alphabate-game-container {
+  height: 100vh;
+  font-family: "Indie Flower", cursive;
+  background-image: url("./assets/images/voice-words.jpg");
+  background-size: contain;
+}
 
 .main-container-tictactoe-home {
   background-image: url("./assets/images/tictactoe-game-bg.jpg");

@@ -3,7 +3,7 @@ import CreateRoom from "../../components/rooms/create";
 
 function VoiceTheAlphabetsHome(props) {
     return (
-        <div>
+        <div className='voice-alphabate-game-home-container'>
             <CreateRoom />
         </div>
     );

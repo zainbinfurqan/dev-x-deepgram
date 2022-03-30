@@ -85,7 +85,7 @@ function VoiceAlphabates(props) {
             if (transcript && received.is_final) {
                 console.log(transcript)
                 console.log(alphabaticNumberToNumaric[transcript])
-                if (alphabaticNumberToNumaric[transcript] > 0 && alphabaticNumberToNumaric[transcript] <= 26 && !tempOpenNumbers.includes(alphabaticNumberToNumaric[transcript])) {
+                if (alphabaticNumberToNumaric[transcript] && alphabaticNumberToNumaric[transcript] > 0 && alphabaticNumberToNumaric[transcript] <= 26 && !tempOpenNumbers.includes(alphabaticNumberToNumaric[transcript])) {
                     tempOpenNumbers.push(alphabaticNumberToNumaric[transcript]);
                     setOpenNumbers(tempOpenNumbers)
                     gameDetails.openNumbers = tempOpenNumbers
@@ -129,7 +129,7 @@ function VoiceAlphabates(props) {
             if (transcript && received.is_final) {
                 console.log(transcript)
                 if (alphabates[openNumbers.length - 1] == alphabaticNumberToNumaric[transcript]) {
-                    gameDetails.writeAnswers++
+                    gameDetails.riteAnswers++
                     gameDetails.openAlphabates.push(alphabates[openNumbers.length - 1])
                     await db.collection('voice-the-alphabate-game').doc(roomDetail.gameId).update({
                         ...gameDetails
@@ -140,7 +140,7 @@ function VoiceAlphabates(props) {
                     console.log(tempWrongGuesses)
                     if (tempWrongGuesses >= 5) {
                         gameDetails.wrongAnswers = 0
-                        gameDetails.writeAnswers = 0
+                        gameDetails.riteAnswers = 0
                         gameDetails.openAlphabates = []
                         gameDetails.openNumbers = []
                         await db.collection('voice-the-alphabate-game').doc(roomDetail.gameId).update({
@@ -160,22 +160,42 @@ function VoiceAlphabates(props) {
     }
 
     return (
-        <div className='bg-black d-flex flex-wrap'>
-            {count.map((item, index) => {
-                return (
-                    <div onClick={() => handleSpeakTheNumber(item)} style={{
-                        boxShadow: '#3aa3a 4px 6px 17px 1px'
-                    }} className='px-4 py-4 m-4 rounded bg-white cursor-pointer'>
-                        {!openNumbers.includes(item) && <h4>{item}</h4>}
-                        {openNumbers.includes(item) &&
-                            // <h4 onClick={() => handleGuessTheAlphabate(alphabates[index], index)}>
-                            <h4 onClick={() => handleGuessTheAlphabate(Math.floor(Math.random() * 100), index)}>
-                                {alphabates[index]}
-                            </h4>}
-                    </div>
-                )
-            })}
-        </div >
+        <div className='voice-alphabate-game-container p-2'>
+            <h2 style={{
+                fontWeight: 'bolder',
+                textAlign: 'center',
+                padding: '16px',
+                fontSize: '57px',
+                color: '#36c0ff',
+                textShadow: '2px 2px 5px #0c0b0b',
+            }}>Guess the Alphabate</h2>
+            {Object.keys(gameDetails).length > 0 && <div style={{
+                width: 'fit-content'
+            }} className='px-4 mx-4 rounded text-dark font-weight-bold bg-white mw-100'>
+                <p>Score:</p>
+                <p>LifeLine Left: {5 - wrongGuesses}</p>
+                <p>Wrong Answers: {gameDetails.wrongAnswers}</p>
+                <p>Right Answers: {gameDetails.riteAnswers}</p>
+            </div>}
+
+            <div className='bg-black d-flex flex-wrap '>
+                {count.map((item, index) => {
+                    return (
+                        <div onClick={() => handleSpeakTheNumber(item)} style={{
+                            backgroundColor: 'darkorchid',
+                            boxShadow: '#3aa3a 4px 6px 17px 1px'
+                        }} className='px-4 py-4 m-4 rounded text-white  cursor-pointer'>
+                            {!openNumbers.includes(item) && <h4 className='font-weight-bold'>{item}</h4>}
+                            {openNumbers.includes(item) &&
+                                // <h4 onClick={() => handleGuessTheAlphabate(alphabates[index], index)}>
+                                <h4 className='font-weight-bold' onClick={() => handleGuessTheAlphabate(Math.floor(Math.random() * 100), index)}>
+                                    {alphabates[index]}
+                                </h4>}
+                        </div>
+                    )
+                })}
+            </div >
+        </div>
     );
 }
 

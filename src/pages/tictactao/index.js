@@ -182,7 +182,13 @@ function TictacTao(props) {
       {Object.keys(game).length > 0 && game.userTurn != user.userId && <WaitForYourTurn />}
       {Object.keys(game).length > 0 && game.isWin && <GameWinner user={game.wins}
         handleStartNewGame={handleStartNewGame} />}
-      <h2 className='text-white text-center p-5'>Tic Tac Toe</h2>
+      <h2 className='text-white text-center p-5' style={{
+        fontWeight: 'bolder',
+        textAlign: 'center',
+        padding: '16px',
+        fontSize: '57px',
+        textShadow: '2px 2px 5px #0c0b0b',
+      }}>Tic Tac Toe</h2>
       <div className="tictoctoe-game-grid">
         <div className="row-1 d-flex">
           <div className="tac-box" id="one one" onClick={() => handleCheckIfSelectedTicAlreadyExsist('one one')}>
