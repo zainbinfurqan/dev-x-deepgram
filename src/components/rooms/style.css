@@ -4,6 +4,7 @@
   width: 200px;
   height: 90vh;
   float: right;
+  box-shadow: 0px -1px 15px 2px #6581a7;
 }
 
 .single-room-container {
@@ -107,13 +108,14 @@
   max-width: 350px;
   margin: 0 auto;
   top: 20%;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  /* bottom: 0; */
+  /* left: 50%; */
+  right: 50%;
   position: absolute;
   background: white;
-  box-shadow: 0px -1px 10px 7px #242424;
+  box-shadow: 0px -1px 15px 2px #6581a7;
   padding: 10px;
+  border-radius: 5px;
 }
 
 .form-panel input {

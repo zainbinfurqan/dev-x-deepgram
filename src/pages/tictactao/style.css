@@ -1,7 +1,6 @@
-.game-main-container {
-  background-color: white;
+.tictoctoe-game-grid {
   border-radius: 5px;
-  box-shadow: 4px 4px 8px -3px #727272;
+  /* box-shadow: 4px 4px 8px -3px #727272; */
   height: 300px;
   width: 300px;
   margin: auto;
@@ -22,11 +21,23 @@
 }
 .tac-box {
   width: 33.3%;
-  border: 0.1em solid #cdcdcd;
+  /* border: 0.1em solid #cdcdcd; */
   height: 100%;
 }
 .tac-box-last {
   width: 34.3%;
-  border: 0.1em solid #cdcdcd;
+  /* border: 0.1em solid #cdcdcd; */
   height: 100%;
+}
+
+.tictoctoe-game-grid {
+  background-color: rgba(255, 255, 255, 0.5);
+  background-image: url("../../assets/images/tictactoe-grid.png");
+  background-size: contain;
+}
+
+.tictoctoe-game-main-container {
+  height: 100vh;
+  background-image: url("../../assets/images/tictactoe-game-bg.jpg");
+  background-size: contain;
 }

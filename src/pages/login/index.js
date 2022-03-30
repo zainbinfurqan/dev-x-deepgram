@@ -38,7 +38,7 @@ function Login(props) {
   }
 
   return (
-    <div>
+    <div className="main-conainer">
       <div className="login-page">
         <div className="form">
           <input type="text" onChange={(e) => setUserName(e.target.value)} placeholder="Name" />

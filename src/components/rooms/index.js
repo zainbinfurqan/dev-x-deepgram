@@ -57,6 +57,7 @@ function Rooms(props) {
   return (
     <div className="rooms-container bg-white p-3 m-3">
       <h4>Game List</h4>
+      {console.log(openEnterRoompanel)}
       {openEnterRoompanel && <JoinRoom
         openEnterRoompanel={openEnterRoompanel}
         handleConfirm={handleConfirm}

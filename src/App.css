@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  font-family: "Indie Flower", cursive;
 }
 
 .App-logo {
@@ -15,6 +16,18 @@
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
   }
+}
+
+.main-conainer {
+  height: 100vh;
+  font-family: "Indie Flower", cursive;
+  background-image: url("./assets/images/mainbg.png");
+  background-size: contain;
+}
+
+.main-container-tictactoe-home {
+  background-image: url("./assets/images/tictactoe-game-bg.jpg");
+  background-size: contain;
 }
 
 .App-header {

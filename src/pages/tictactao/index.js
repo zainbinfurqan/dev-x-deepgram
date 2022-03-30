@@ -178,13 +178,12 @@ function TictacTao(props) {
   }, [game.userTurn])
 
   return (
-    <div>
-      {console.log("gameMap", gameMap)}
+    <div className="tictoctoe-game-main-container">
       {Object.keys(game).length > 0 && game.userTurn != user.userId && <WaitForYourTurn />}
       {Object.keys(game).length > 0 && game.isWin && <GameWinner user={game.wins}
         handleStartNewGame={handleStartNewGame} />}
       <h2 className='text-white text-center p-5'>Tic Tac Toe</h2>
-      <div className="game-main-container">
+      <div className="tictoctoe-game-grid">
         <div className="row-1 d-flex">
           <div className="tac-box" id="one one" onClick={() => handleCheckIfSelectedTicAlreadyExsist('one one')}>
             <TicTacSign ticSign={Object.keys(gameMap).length > 0 &&

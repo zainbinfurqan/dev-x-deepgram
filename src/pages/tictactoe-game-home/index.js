@@ -10,9 +10,15 @@ function TicTacToeHome(props) {
   }, [])
 
   return (
-    <div>
-      <Rooms />
-      <CreateRoom />
+    <div className="d-flex main-container-tictactoe-home" style={{
+      fontFamily: '"Indie Flower", cursive'
+    }}>
+      <div className="w-75">
+        <CreateRoom />
+      </div>
+      <div className="w-25">
+        <Rooms />
+      </div>
     </div>
   );
 }
