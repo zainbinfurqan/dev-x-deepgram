@@ -29,6 +29,21 @@ export const firbaseMethods = {
       console.log(error)
     }
   },
+  createRoomForVoiceTheAlphabateGame: async (data, gameData) => {
+    try {
+      const response = await db.collection('rooms').add({
+        ...data,
+      });
+      const gameResponse = await firbaseMethods.createGameForVoiceTheAlphabate(response.id, gameData)
+      await db.collection('rooms').doc(response.id).update({
+        gameId: gameResponse
+      });
+      const roomData = await db.collection('rooms').doc(response.id).get();
+      return roomData.data()
+    } catch (error) {
+      console.log(error)
+    }
+  },
   //---------
   getRooms: async () => {
     const response = await db.collection('rooms').get();
@@ -66,7 +81,17 @@ export const firbaseMethods = {
       console.log(error)
     }
   },
-
+  createGameForVoiceTheAlphabate: async (roomId, game) => {
+    try {
+      const response = await db.collection('voice-the-alphabate-game').add({
+        roomId,
+        ...game
+      });
+      return response.id
+    } catch (error) {
+      console.log(error)
+    }
+  },
   joinGame: async (password, data, userId) => {
     try {
       var singleRoom = db.collection('rooms').doc(data.id);

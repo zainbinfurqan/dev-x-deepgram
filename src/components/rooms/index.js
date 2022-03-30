@@ -49,7 +49,7 @@ function Rooms(props) {
     if (response) {
       console.log(response)
       await localStorageMethods.setItem('room', { ...response })
-      await localStorageMethods.setItem('game', { gameId: response.gameId })
+      await localStorageMethods.setItem('tictactoe-game', { gameId: response.gameId })
       history('/game-tictactoe')
     }
   }

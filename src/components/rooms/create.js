@@ -10,27 +10,50 @@ function CreateRoom(props) {
   const [room, setRoom] = useState('');
   const [roomPassword, setRoomPassword] = useState('')
   const [GameInstructionsIsOpen, setGameInstructionsIsOpen] = useState(false)
-
   const handleCreateRoom = async () => {
-    try {
-      const { userId } = await localStorageMethods.getItem('user');
-      const data = { room, roomPassword, users: [userId] };
-      const gameData = {
-        adminUser: await userId,
-        userTurn: await userId,
-        isWin: false,
-        wins: [],
-        ticTacData: [],
-        users: [userId],
+    const { userId } = await localStorageMethods.getItem('user');
+    const data = { room, roomPassword, users: userId };
+    console.log(window.location.pathname)
+    if (window.location.pathname == '/game-voice-alphabates-home') {
+      try {
+        const creatingGameCollectionForFirebase = {
+          adminUser: await userId,
+          users: userId,
+          wrongAnswers: 0,
+          writeAnswers: 0,
+          alphabates: ['P', 'B', 'X', 'V', 'S', 'I', 'G', 'N', 'F', 'J', 'K', 'Y',
+            'M', 'H', 'O', 'A', 'Q', 'R', 'E', 'T', 'U', 'D', 'W', 'C',
+            'L', 'Z'],
+          openNumbers: []
+        }
+        const response = await firbaseMethods.createRoomForVoiceTheAlphabateGame(data, creatingGameCollectionForFirebase);
+        await localStorageMethods.setItem('room', { ...response })
+        await localStorageMethods.setItem('voice-the-alphabate-game', { gameId: response.gameId })
+        history('/game-voice-alphabates')
+      } catch (error) {
+
       }
-      gameData[userId] = 'square'
-      const response = await firbaseMethods.createRoom(data, gameData);
-      await localStorageMethods.setItem('room', { ...response })
-      await localStorageMethods.setItem('game', { gameId: response.gameId })
-      history('/game-tictactoe')
-    } catch (error) {
-      console.log(error)
     }
+    if (window.location.pathname == '/game-tictactoe-home') {
+      try {
+        const gameData = {
+          adminUser: await userId,
+          userTurn: await userId,
+          isWin: false,
+          wins: [],
+          ticTacData: [],
+          users: [userId],
+        }
+        gameData[userId] = 'square'
+        const response = await firbaseMethods.createRoom(data, gameData);
+        await localStorageMethods.setItem('room', { ...response })
+        await localStorageMethods.setItem('tictactoe-game', { gameId: response.gameId })
+        history('/game-tictactoe')
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
 
   }
 
